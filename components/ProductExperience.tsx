@@ -42,14 +42,12 @@ export function ProductExperience({ product }: { product: BundleProduct }) {
 
     // Group by variant id so "2 Black" becomes one line at quantity 2,
     // not two separate quantity-1 lines — matches the cart permalink format.
-    const quantities = new Map<string, { name: string; hex: string; image: string; quantity: number }>();
+    const quantities = new Map<string, { name: string; hex: string; quantity: number }>();
     for (const c of selected) {
       const existing = quantities.get(c.variantId);
       quantities.set(
         c.variantId,
-        existing
-          ? { ...existing, quantity: existing.quantity + 1 }
-          : { name: c.name, hex: c.hex, image: c.image ?? product.image, quantity: 1 }
+        existing ? { ...existing, quantity: existing.quantity + 1 } : { name: c.name, hex: c.hex, quantity: 1 }
       );
     }
     const newLines = Array.from(quantities, ([variantId, data]) => ({ variantId, ...data }));
@@ -153,16 +151,14 @@ export function ProductExperience({ product }: { product: BundleProduct }) {
                               return next;
                             })
                           }
-                          className="relative w-10 h-10 rounded-xl overflow-hidden transition hover:scale-105"
+                          className="w-10 h-10 rounded-xl transition hover:scale-105"
                           style={{
+                            backgroundColor: c.hex,
                             boxShadow: selected
                               ? "0 0 0 2px var(--color-ivory), 0 0 0 3px var(--color-gold)"
                               : "0 0 0 1px rgba(30,27,24,0.15)",
                           }}
-                        >
-                          <Image src={c.image ?? product.image} alt="" fill sizes="40px" className="object-cover" />
-                          <span className="absolute inset-0" style={{ backgroundColor: c.hex, mixBlendMode: "color" }} />
-                        </button>
+                        />
                       );
                     })}
                   </div>

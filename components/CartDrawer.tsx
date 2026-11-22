@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import { useCart } from "./CartContext";
 import { Icon } from "./Icon";
 import { PaymentBadges } from "./PaymentBadges";
@@ -57,10 +56,7 @@ export function CartDrawer() {
             <div className="flex flex-col gap-4">
               {lines.map((line) => (
                 <div key={line.variantId} className="flex gap-3 items-center">
-                  <div className="w-14 h-14 rounded-xl overflow-hidden flex-shrink-0 bg-cashmere relative">
-                    <Image src={line.image} alt="" fill sizes="56px" className="object-cover" />
-                    <span className="absolute inset-0" style={{ backgroundColor: line.hex, mixBlendMode: "color" }} />
-                  </div>
+                  <div className="w-14 h-14 rounded-xl flex-shrink-0" style={{ backgroundColor: line.hex }} />
                   <div className="flex-1 min-w-0">
                     <div className="text-[13.5px] font-semibold truncate">{line.name}</div>
                     <div className="text-[12.5px] text-[#5c5650]">$27.99</div>

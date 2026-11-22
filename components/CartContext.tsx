@@ -8,7 +8,6 @@ export type CartLine = {
   variantId: string;
   name: string;
   hex: string;
-  image: string;
   quantity: number;
 };
 
