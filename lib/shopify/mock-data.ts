@@ -28,7 +28,7 @@ export const MOCK_PRODUCT: BundleProduct = {
     },
   ],
   // Real Shopify variants — "Couple Holding Hands Knitted Winter Mittens (Free Size)"
-  // on 7vrbb8-gh.myshopify.com.
+  // checkout via checkout.loversmittens.com.
   colors: [
     { name: "Black", hex: "#1A1A1A", variantId: "46511540699205" },
     { name: "Brown", hex: "#6B4423", variantId: "46511540731973" },

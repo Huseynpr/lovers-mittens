@@ -1,4 +1,4 @@
-const SHOPIFY_STORE_DOMAIN = "7vrbb8-gh.myshopify.com";
+const SHOPIFY_STORE_DOMAIN = "checkout.loversmittens.com";
 
 // Shopify's cart permalink: /cart/{variantId}:{quantity},{variantId}:{quantity}
 // adds those variants straight into the shopper's real Shopify cart and sends
