@@ -1,26 +1,144 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --color-ivory: #faf7f2;
+  --color-cashmere: #f2ece4;
+  --color-espresso: #1e1b18;
+  --color-gold: #c5a059;
+  --color-evergreen: #1f3a2e;
+  --color-berry: #7a2021;
+  /* "Together, in the cold" concept moment — a deep winter-night accent pair,
+     used only for that one section so the base palette stays warm/quiet-luxury. */
+  --color-midnight: #0f1e2e;
+  --color-midnight-deep: #0a141f;
+  --color-ice: #cfe8f3;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-ivory: var(--color-ivory);
+  --color-cashmere: var(--color-cashmere);
+  --color-espresso: var(--color-espresso);
+  --color-gold: var(--color-gold);
+  --color-evergreen: var(--color-evergreen);
+  --color-berry: var(--color-berry);
+  --color-midnight: var(--color-midnight);
+  --color-midnight-deep: var(--color-midnight-deep);
+  --color-ice: var(--color-ice);
+  --font-heading: var(--font-cormorant);
+  --font-sans: var(--font-jakarta);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--color-ivory);
+  color: var(--color-espresso);
+  /* Visible all-over winter texture — gold/evergreen/berry flecks, not flat ivory. */
+  background-image:
+    radial-gradient(circle at 10% 15%, rgba(197, 160, 89, 0.16) 0 2.5px, transparent 2.5px),
+    radial-gradient(circle at 55% 45%, rgba(31, 58, 46, 0.1) 0 2px, transparent 2px),
+    radial-gradient(circle at 85% 75%, rgba(122, 32, 33, 0.1) 0 2.5px, transparent 2.5px),
+    radial-gradient(circle at 30% 85%, rgba(197, 160, 89, 0.12) 0 2px, transparent 2px),
+    radial-gradient(circle at 75% 20%, rgba(31, 58, 46, 0.08) 0 2px, transparent 2px);
+  background-size:
+    160px 160px,
+    190px 190px,
+    220px 220px,
+    140px 140px,
+    200px 200px;
+}
+
+.lm-candy-stripe {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    var(--color-berry) 0 10px,
+    var(--color-ivory) 10px 20px
+  );
+}
+
+@layer utilities {
+  .lm-divider {
+    position: relative;
+  }
+  .lm-divider::before,
+  .lm-divider::after {
+    content: "";
+    flex: 1;
+    max-width: 120px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--color-gold), transparent);
+  }
+}
+
+details.lm-faq summary {
+  list-style: none;
+}
+details.lm-faq summary::-webkit-details-marker {
+  display: none;
+}
+details.lm-faq[open] .lm-chevron {
+  transform: rotate(180deg);
+}
+
+@keyframes lm-fall {
+  0% {
+    transform: translateY(-10vh) translateX(0);
+  }
+  50% {
+    transform: translateY(55vh) translateX(14px);
+  }
+  100% {
+    transform: translateY(110vh) translateX(-10px);
+  }
+}
+
+@keyframes lm-fall-big {
+  0% {
+    transform: translateY(-12vh) translateX(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(55vh) translateX(26px) rotate(90deg);
+  }
+  100% {
+    transform: translateY(112vh) translateX(-18px) rotate(180deg);
+  }
+}
+
+@keyframes lm-spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes lm-float {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(18px, -22px) scale(1.06);
+  }
+}
+
+@keyframes lm-twinkle {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.9;
+    transform: scale(1.25);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-\[lm-fall_linear_infinite\],
+  .animate-\[lm-fall-big_linear_infinite\],
+  .animate-\[lm-spin-slow_linear_infinite\],
+  .animate-\[lm-float_ease-in-out_infinite\],
+  .animate-\[lm-twinkle_ease-in-out_infinite\] {
+    animation: none !important;
+  }
 }
