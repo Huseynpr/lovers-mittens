@@ -4,8 +4,19 @@ import type { BundleProduct } from "./types";
 // so the site runs and looks right before the Shopify product exists.
 export const MOCK_PRODUCT: BundleProduct = {
   title: "The Lovers Mittens — Hold Hands, Stay Warm",
-  image: "/images/mittens-set.webp",
-  images: ["/images/mittens-set.webp", "/images/logo-mitten.png"],
+  image: "/images/mittens-black-lifestyle.webp",
+  images: [
+    "/images/mittens-black-lifestyle.webp",
+    "/images/mittens-black-flatlay.webp",
+    "/images/mittens-brown-lifestyle.webp",
+    "/images/mittens-brown-flatlay.webp",
+    "/images/mittens-lightgray-lifestyle.webp",
+    "/images/mittens-lightgray-flatlay.webp",
+    "/images/mittens-red-lifestyle.webp",
+    "/images/mittens-red-flatlay.webp",
+    "/images/mittens-yellow-lifestyle.webp",
+    "/images/mittens-yellow-flatlay.webp",
+  ],
   bundles: [
     { setCount: 1, name: "1 Set — Single Couple Set", price: 27.99, compareAtPrice: 44.99 },
     {
@@ -30,10 +41,10 @@ export const MOCK_PRODUCT: BundleProduct = {
   // Real Shopify variants — "Couple Holding Hands Knitted Winter Mittens (Free Size)"
   // checkout via checkout.loversmittens.com.
   colors: [
-    { name: "Black", hex: "#1A1A1A", variantId: "46511540699205" },
-    { name: "Brown", hex: "#6B4423", variantId: "46511540731973" },
-    { name: "Light Gray", hex: "#C9C6C0", variantId: "46511540764741" },
-    { name: "Red", hex: "#B0272B", variantId: "46511540797509" },
-    { name: "Yellow", hex: "#E0B23A", variantId: "46511540830277" },
+    { name: "Black", hex: "#1A1A1A", variantId: "46511540699205", image: "/images/mittens-black-flatlay.webp" },
+    { name: "Brown", hex: "#6B4423", variantId: "46511540731973", image: "/images/mittens-brown-flatlay.webp" },
+    { name: "Light Gray", hex: "#C9C6C0", variantId: "46511540764741", image: "/images/mittens-lightgray-flatlay.webp" },
+    { name: "Red", hex: "#B0272B", variantId: "46511540797509", image: "/images/mittens-red-flatlay.webp" },
+    { name: "Yellow", hex: "#E0B23A", variantId: "46511540830277", image: "/images/mittens-yellow-flatlay.webp" },
   ],
 };
