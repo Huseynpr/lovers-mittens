@@ -16,6 +16,7 @@ export const MOCK_PRODUCT: BundleProduct = {
     "/images/mittens-red-flatlay.webp",
     "/images/mittens-yellow-lifestyle.webp",
     "/images/mittens-yellow-flatlay.webp",
+    "/images/mittens-mix-flatlay.webp",
   ],
   bundles: [
     { setCount: 1, name: "1 Set — Single Couple Set", price: 27.99, compareAtPrice: 44.99 },
