@@ -8,7 +8,7 @@ import { Icon } from "./Icon";
 import { ProductGallery } from "./ProductGallery";
 import { PaymentBadges } from "./PaymentBadges";
 import { SnowCap } from "./SnowCap";
-import type { BundleProduct } from "@/lib/shopify/types";
+import type { BundleProduct, ColorOption } from "@/lib/shopify/types";
 
 export function ProductExperience({ product }: { product: BundleProduct }) {
   const { addLines } = useCart();
@@ -18,6 +18,8 @@ export function ProductExperience({ product }: { product: BundleProduct }) {
     product.colors[1]?.name ?? null,
     product.colors[2]?.name ?? null,
   ]);
+  // The gallery follows whichever color swatch was changed most recently.
+  const [activeColorName, setActiveColorName] = useState(product.colors[0]?.name ?? "");
   const [stickyVisible, setStickyVisible] = useState(false);
 
   const bundle = product.bundles[bundleIndex];
@@ -63,7 +65,7 @@ export function ProductExperience({ product }: { product: BundleProduct }) {
         <div className="pointer-events-none absolute bottom-0 left-1/3 w-[300px] h-[300px] rounded-full bg-berry/10 blur-[100px] animate-[lm-float_11s_ease-in-out_infinite]" style={{ animationDelay: "-3s" }} />
 
         <div className="relative max-w-[1180px] mx-auto px-6 pt-8 md:pt-12 pb-20 grid md:grid-cols-[1.1fr_1fr] gap-12 items-start">
-        <ProductGallery images={product.images} alt={product.title} />
+        <ProductGallery colors={product.colors} mixImage={product.mixImage} activeColorName={activeColorName} alt={product.title} />
 
         <div>
           <span className="inline-flex items-center gap-1.5 text-[11.5px] tracking-[0.16em] uppercase text-gold font-semibold mb-2.5">
@@ -137,30 +139,21 @@ export function ProductExperience({ product }: { product: BundleProduct }) {
                     <span className="text-gold font-semibold">{colors[i]}</span>
                   </div>
                   <div className="flex gap-3 flex-wrap">
-                    {product.colors.map((c) => {
-                      const selected = colors[i] === c.name;
-                      return (
-                        <button
-                          key={c.name}
-                          type="button"
-                          aria-label={c.name}
-                          onClick={() =>
-                            setColors((prev) => {
-                              const next = [...prev];
-                              next[i] = c.name;
-                              return next;
-                            })
-                          }
-                          className="w-10 h-10 rounded-xl transition hover:scale-105"
-                          style={{
-                            backgroundColor: c.hex,
-                            boxShadow: selected
-                              ? "0 0 0 2px var(--color-ivory), 0 0 0 3px var(--color-gold)"
-                              : "0 0 0 1px rgba(30,27,24,0.15)",
-                          }}
-                        />
-                      );
-                    })}
+                    {product.colors.map((c) => (
+                      <ColorSwatch
+                        key={c.name}
+                        color={c}
+                        selected={colors[i] === c.name}
+                        onClick={() => {
+                          setColors((prev) => {
+                            const next = [...prev];
+                            next[i] = c.name;
+                            return next;
+                          });
+                          setActiveColorName(c.name);
+                        }}
+                      />
+                    ))}
                   </div>
                 </div>
               </motion.div>
@@ -229,5 +222,38 @@ function Pill({ icon, label }: { icon: Parameters<typeof Icon>[0]["name"]; label
       <Icon name={icon} size={14} />
       {label}
     </span>
+  );
+}
+
+function ColorSwatch({ color, selected, onClick }: { color: ColorOption; selected: boolean; onClick: () => void }) {
+  const [imageFailed, setImageFailed] = useState(false);
+
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label={color.name}
+      aria-pressed={selected}
+      title={color.name}
+      className="relative w-11 h-11 rounded-xl overflow-hidden transition hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-ivory"
+      style={{
+        boxShadow: selected
+          ? "0 0 0 2px var(--color-ivory), 0 0 0 3px var(--color-gold)"
+          : "0 0 0 1px rgba(30,27,24,0.15)",
+      }}
+    >
+      {imageFailed ? (
+        <span className="absolute inset-0" style={{ backgroundColor: color.hex }} />
+      ) : (
+        <Image
+          src={color.flatlayImage}
+          alt=""
+          fill
+          sizes="44px"
+          className="object-cover"
+          onError={() => setImageFailed(true)}
+        />
+      )}
+    </button>
   );
 }

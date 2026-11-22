@@ -3,15 +3,15 @@ import { PRODUCT_QUERY } from "./queries";
 import { MOCK_PRODUCT } from "./mock-data";
 import type { BundleProduct } from "./types";
 
-// Bundle pricing and color variant ids are fixed, static catalog data (see
-// mock-data.ts) — checkout goes straight to Shopify via cart permalinks, so
-// there's no Storefront API product/variant fetch to keep them in sync with.
-// Only the photos and title are optionally pulled live from Shopify.
+// Bundle pricing, per-color photos, and variant ids are fixed, static catalog
+// data (see mock-data.ts) — checkout goes straight to Shopify via cart
+// permalinks, so there's no Storefront API product/variant fetch to keep them
+// in sync with. Only the title and hero fallback photo are optionally pulled
+// live from Shopify.
 type ProductQueryResult = {
   product: {
     title: string;
     featuredImage: { url: string } | null;
-    images: { edges: { node: { url: string } }[] };
   } | null;
 };
 
@@ -34,13 +34,10 @@ export async function getBundleProduct(): Promise<BundleProduct> {
       return MOCK_PRODUCT;
     }
 
-    const images = data.product.images.edges.map((e) => e.node.url);
-
     return {
       ...MOCK_PRODUCT,
       title: data.product.title,
-      image: data.product.featuredImage?.url ?? images[0] ?? MOCK_PRODUCT.image,
-      images: images.length > 0 ? images : MOCK_PRODUCT.images,
+      image: data.product.featuredImage?.url ?? MOCK_PRODUCT.image,
     };
   } catch {
     return MOCK_PRODUCT;

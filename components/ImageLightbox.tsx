@@ -1,9 +1,11 @@
 "use client";
 
-import { useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import Image from "next/image";
 
 const SWIPE_THRESHOLD = 50;
+const FOCUSABLE_SELECTOR = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
 
 export function ImageLightbox({
   images,
@@ -19,9 +21,61 @@ export function ImageLightbox({
   onNavigate: (index: number) => void;
 }) {
   const touchStartX = useRef<number | null>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
   const hasMultiple = images.length > 1;
 
-  const show = (i: number) => onNavigate((i + images.length) % images.length);
+  const show = useCallback((i: number) => onNavigate((i + images.length) % images.length), [images.length, onNavigate]);
+
+  // Lock page scroll while open, restore it on close.
+  useEffect(() => {
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, []);
+
+  // Focus the dialog on open, return focus to whatever opened it on close.
+  useEffect(() => {
+    const previouslyFocused = document.activeElement as HTMLElement | null;
+    dialogRef.current?.focus();
+    return () => {
+      previouslyFocused?.focus();
+    };
+  }, []);
+
+  // Escape closes, arrow keys navigate, Tab is trapped inside the dialog.
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        onClose();
+        return;
+      }
+      if (hasMultiple && e.key === "ArrowLeft") {
+        show(index - 1);
+        return;
+      }
+      if (hasMultiple && e.key === "ArrowRight") {
+        show(index + 1);
+        return;
+      }
+      if (e.key === "Tab" && dialogRef.current) {
+        const focusable = dialogRef.current.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR);
+        if (focusable.length === 0) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [index, images.length, hasMultiple, onClose, show]);
 
   const onTouchStart = (e: React.TouchEvent) => {
     touchStartX.current = e.touches[0].clientX;
@@ -35,8 +89,16 @@ export function ImageLightbox({
     }
   };
 
-  return (
-    <div className="fixed inset-0 z-[90] flex items-center justify-center bg-espresso/95">
+  return createPortal(
+    <div
+      ref={dialogRef}
+      role="dialog"
+      aria-modal="true"
+      aria-label={`${alt} photos`}
+      tabIndex={-1}
+      onClick={onClose}
+      className="fixed inset-0 z-[200] flex items-center justify-center bg-espresso/95 outline-none"
+    >
       <button
         type="button"
         onClick={onClose}
@@ -56,6 +118,7 @@ export function ImageLightbox({
 
       <div
         className="relative w-full h-full max-w-[720px] max-h-[82vh] mx-6"
+        onClick={(e) => e.stopPropagation()}
         onTouchStart={onTouchStart}
         onTouchEnd={onTouchEnd}
       >
@@ -67,7 +130,10 @@ export function ImageLightbox({
           <button
             type="button"
             aria-label="Previous photo"
-            onClick={() => show(index - 1)}
+            onClick={(e) => {
+              e.stopPropagation();
+              show(index - 1);
+            }}
             className="absolute left-2 md:left-6 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-ivory/15 text-ivory flex items-center justify-center hover:bg-ivory/25 transition"
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -77,7 +143,10 @@ export function ImageLightbox({
           <button
             type="button"
             aria-label="Next photo"
-            onClick={() => show(index + 1)}
+            onClick={(e) => {
+              e.stopPropagation();
+              show(index + 1);
+            }}
             className="absolute right-2 md:right-6 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-ivory/15 text-ivory flex items-center justify-center hover:bg-ivory/25 transition"
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -85,7 +154,7 @@ export function ImageLightbox({
             </svg>
           </button>
 
-          <div className="absolute bottom-5 left-1/2 -translate-x-1/2 flex gap-2">
+          <div className="absolute bottom-5 left-1/2 -translate-x-1/2 flex gap-2" onClick={(e) => e.stopPropagation()}>
             {images.map((img, i) => (
               <button
                 key={img}
@@ -98,6 +167,7 @@ export function ImageLightbox({
           </div>
         </>
       ) : null}
-    </div>
+    </div>,
+    document.body
   );
 }

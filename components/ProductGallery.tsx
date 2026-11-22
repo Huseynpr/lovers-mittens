@@ -1,17 +1,53 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
+import { AnimatePresence, motion } from "framer-motion";
 import { Monogram } from "./Logo";
 import { ImageLightbox } from "./ImageLightbox";
+import type { ColorOption } from "@/lib/shopify/types";
 
 const SWIPE_THRESHOLD = 50;
 
-export function ProductGallery({ images, alt }: { images: string[]; alt: string }) {
+export function ProductGallery({
+  colors,
+  mixImage,
+  activeColorName,
+  alt,
+}: {
+  colors: ColorOption[];
+  mixImage: string;
+  activeColorName: string;
+  alt: string;
+}) {
+  const activeColor = colors.find((c) => c.name === activeColorName) ?? colors[0];
+  const images = useMemo(
+    () => [activeColor.lifestyleImage, activeColor.flatlayImage, mixImage],
+    [activeColor, mixImage]
+  );
+
   const [active, setActive] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const touchStartX = useRef<number | null>(null);
   const hasMultiple = images.length > 1;
+
+  // Switching color always starts back at the first (lifestyle) photo. Adjusting
+  // state during render (rather than in an effect) avoids an extra render pass.
+  const [renderedColorName, setRenderedColorName] = useState(activeColor.name);
+  if (renderedColorName !== activeColor.name) {
+    setRenderedColorName(activeColor.name);
+    setActive(0);
+  }
+
+  // Preload every color's photos once, so switching colors feels instant.
+  useEffect(() => {
+    for (const c of colors) {
+      const lifestyle = new window.Image();
+      lifestyle.src = c.lifestyleImage;
+      const flatlay = new window.Image();
+      flatlay.src = c.flatlayImage;
+    }
+  }, [colors]);
 
   const show = (index: number) => setActive((index + images.length) % images.length);
 
@@ -40,7 +76,18 @@ export function ProductGallery({ images, alt }: { images: string[]; alt: string 
           aria-label="View full size"
           className="absolute inset-0"
         >
-          <Image src={images[active]} alt={alt} fill priority sizes="(min-width: 768px) 45vw, 100vw" className="object-cover" />
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={images[active]}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.18 }}
+              className="absolute inset-0"
+            >
+              <Image src={images[active]} alt={alt} fill priority sizes="(min-width: 768px) 45vw, 100vw" className="object-cover" />
+            </motion.div>
+          </AnimatePresence>
         </button>
 
         <div className="absolute top-4 left-4 bg-evergreen text-ivory text-[11px] font-semibold tracking-wide px-3 py-1.5 rounded-full shadow">
@@ -80,7 +127,7 @@ export function ProductGallery({ images, alt }: { images: string[]; alt: string 
       </div>
 
       {hasMultiple ? (
-        <div className="mt-3 grid grid-cols-4 gap-2.5">
+        <div className="mt-3 grid grid-cols-3 gap-2.5">
           {images.map((img, i) => (
             <button
               key={img}
@@ -91,20 +138,14 @@ export function ProductGallery({ images, alt }: { images: string[]; alt: string 
                 i === active ? "border-gold" : "border-espresso/10 hover:border-gold/50"
               }`}
             >
-              <Image src={img} alt="" fill sizes="80px" className="object-cover" />
+              <Image src={img} alt="" fill sizes="120px" className="object-cover" />
             </button>
           ))}
         </div>
       ) : null}
 
       {lightboxOpen ? (
-        <ImageLightbox
-          images={images}
-          alt={alt}
-          index={active}
-          onClose={() => setLightboxOpen(false)}
-          onNavigate={show}
-        />
+        <ImageLightbox images={images} alt={alt} index={active} onClose={() => setLightboxOpen(false)} onNavigate={show} />
       ) : null}
     </div>
   );

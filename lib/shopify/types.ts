@@ -1,9 +1,11 @@
 export type ColorOption = {
   name: string;
+  // Fallback only — used if a photo fails to load, never shown otherwise.
   hex: string;
-  // Real per-color product photo, once you have one per variant.
-  // Until then the swatch falls back to the main product photo, tinted with `hex`.
-  image?: string;
+  // Lifestyle photo: a couple wearing the mittens in this color.
+  lifestyleImage: string;
+  // Clean flat-lay product photo in this color — also used for the swatch thumbnail.
+  flatlayImage: string;
   // The Shopify variant ID for this color (cart permalink checkout needs one
   // variant ID per color — not per bundle). Replace the placeholder with the
   // real id from Shopify admin (Products -> this product -> this variant).
@@ -25,10 +27,10 @@ export type BundleOption = {
 
 export type BundleProduct = {
   title: string;
-  // image: the featured/first photo — used wherever only one photo fits
-  // (brand story, cart lines, sticky bar). images: the full gallery.
+  // Fallback hero photo — used wherever only one photo fits (brand story, sticky bar).
   image: string;
-  images: string[];
+  // Shared "all colors together" photo, shown as the last gallery image for every color.
+  mixImage: string;
   bundles: BundleOption[];
   colors: ColorOption[];
 };

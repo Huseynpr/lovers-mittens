@@ -5,13 +5,6 @@ export const PRODUCT_QUERY = /* GraphQL */ `
       featuredImage {
         url
       }
-      images(first: 10) {
-        edges {
-          node {
-            url
-          }
-        }
-      }
     }
   }
 `;
