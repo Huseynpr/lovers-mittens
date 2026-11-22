@@ -44,12 +44,14 @@ export function ProductExperience({ product }: { product: BundleProduct }) {
 
     // Group by variant id so "2 Black" becomes one line at quantity 2,
     // not two separate quantity-1 lines — matches the cart permalink format.
-    const quantities = new Map<string, { name: string; hex: string; quantity: number }>();
+    const quantities = new Map<string, { name: string; hex: string; image: string; quantity: number }>();
     for (const c of selected) {
       const existing = quantities.get(c.variantId);
       quantities.set(
         c.variantId,
-        existing ? { ...existing, quantity: existing.quantity + 1 } : { name: c.name, hex: c.hex, quantity: 1 }
+        existing
+          ? { ...existing, quantity: existing.quantity + 1 }
+          : { name: c.name, hex: c.hex, image: c.flatlayImage, quantity: 1 }
       );
     }
     const newLines = Array.from(quantities, ([variantId, data]) => ({ variantId, ...data }));

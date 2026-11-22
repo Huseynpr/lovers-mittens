@@ -1,10 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { useCart } from "./CartContext";
 import { Icon } from "./Icon";
 import { PaymentBadges } from "./PaymentBadges";
 import { buildCartPermalink } from "@/lib/shopify/checkout";
+import { MOCK_PRODUCT } from "@/lib/shopify/mock-data";
 
 export function CartDrawer() {
   const { lines, isOpen, closeCart, updateQuantity, removeLine, totalSets, pricing } = useCart();
@@ -56,7 +58,7 @@ export function CartDrawer() {
             <div className="flex flex-col gap-4">
               {lines.map((line) => (
                 <div key={line.variantId} className="flex gap-3 items-center">
-                  <div className="w-14 h-14 rounded-xl flex-shrink-0" style={{ backgroundColor: line.hex }} />
+                  <CartLineThumbnail image={line.image} />
                   <div className="flex-1 min-w-0">
                     <div className="text-[13.5px] font-semibold truncate">{line.name}</div>
                     <div className="text-[12.5px] text-[#5c5650]">$27.99</div>
@@ -127,5 +129,16 @@ export function CartDrawer() {
         ) : null}
       </aside>
     </>
+  );
+}
+
+function CartLineThumbnail({ image }: { image: string }) {
+  const [failed, setFailed] = useState(false);
+  const src = failed || !image ? MOCK_PRODUCT.image : image;
+
+  return (
+    <div className="relative w-14 h-14 rounded-xl overflow-hidden flex-shrink-0 bg-cashmere">
+      <Image src={src} alt="" fill sizes="56px" className="object-cover" onError={() => setFailed(true)} />
+    </div>
   );
 }
